@@ -1,0 +1,36 @@
+{
+	"links": {
+		"logo": "https://cdn.traveldiariesapp.com//images/logo-travel-diaries.png",
+		"bannerBackground": "https://cloud.squidex.io/api/assets/travel-diaries/43c1acaf-1e2a-42f7-85c6-7b4fea07c414?width=1200",
+		"authorAvatar": "https://cloud.squidex.io/api/assets/travel-diaries/37653317-a552-4067-a9c4-8cb421046908?width=786&height=786",
+		"diariesBackground": "https://cdn.traveldiariesapp.com/images/blog/about-diary-blog.jpg"
+	},
+	"socialLinks": [
+		"fab fa-facebook-f",
+		"fab fa-google-plus",
+		"fab fa-twitter",
+		"fab fa-pinterest"
+	],
+	"categoryItems": [
+		"Adventure",
+		"Susistanable travel",
+		"Travel tips",
+		"Cities",
+		"Destinations",
+		"Hotels"
+	],
+	"tags": [
+		"Adventure",
+		"Susistanable travel",
+		"Travel tips",
+		"Cities",
+		"Asia",
+		"Europe",
+		"Destinations",
+		"Africa",
+		"South America",
+		"North America",
+		"Oceania",
+		"Hotels"
+	]
+}
