@@ -1,426 +1,301 @@
-import Head from "next/head";
-import styled from "styled-components";
-import Layout from "../components/Layout";
-import { data } from "../lib/BlogData.json";
-import { links, categoryItems, socialLinks, tags } from "../lib/data.json";
-import {
-	Container,
-	Image,
-	AnchorLink,
-	Paragraph,
-	UnorderedList,
-	ListItem,
-	Icon,
-} from "../components/Reusable";
-import moment from "moment";
-import _ from "lodash";
-
-const Banner = styled.section`
-	height: 75em;
-	background: url(${({ img }) => img});
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	-webkit-box-shadow: 10px 10px 24px -11px #ededed;
-	box-shadow: 10px 10px 24px -11px #ededed;
-	border-bottom: 0.1em solid #ededed;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	padding: 2em;
-	@media (max-width: 767px) {
-		height: 50em;
-	}
-`;
-
-const BannerElement = styled.div`
-	background: rgba(255, 255, 255, 0.8);
-	text-align: center;
-	padding: 5em;
-	width: 65em;
-	max-width: 65em;
-	clip-path: polygon(
-		51% 0,
-		100% 0,
-		100% 36%,
-		100% 85%,
-		95% 100%,
-		5% 100%,
-		0 85%,
-		0% 35%,
-		0 0
-	);
-`;
-
-const BannerTitle = styled.h1`
-	margin-bottom: 0;
-	font-weight: 100;
-	text-transform: uppercase;
-	position: relative;
-	font-size: 2.7em;
-	line-height: 1.5em;
-	&:after {
-		content: "";
-		width: 3em;
-		height: 0.08em;
-		background: #565656;
-		position: absolute;
-		bottom: -0.5em;
-		left: 50%;
-		transform: translateX(-50%);
-	}
-	@media (max-width: 767px) {
-		font-size: 2em;
-	}
-`;
-
-const BannerDate = styled.h5`
-	margin: 2em 0 0;
-	text-transform: uppercase;
-	font-size: 1.6em;
-	font-weight: 400;
-	line-height: 1.3em;
-`;
-
-const SubBanner = styled.section`
-	padding: 4em 0 0;
-	text-align: center;
-`;
-
-const SubBannerTitle = styled.h2`
-	font-size: 1.8em;
-	line-height: 1.2em;
-	font-style: italic;
-	font-weight: 400;
-`;
-
-const SubBannerAuthor = styled.div`
-	display: flex;
-	padding: 3.5em 0;
-	@media (max-width: 767px) {
-		flex-flow: column wrap;
-		text-align: center;
-	}
-`;
-
-const SubBannerAuthorAvatar = styled.img`
-	width: 12em;
-	height: 12em;
-	border-radius: 50%;
-	object-fit: fill;
-	-webkit-box-shadow: 10px 10px 24px -11px #ededed;
-	box-shadow: 10px 10px 24px -11px #ededed;
-	border: 0.1em solid #ededed;
-	@media (max-width: 767px) {
-		margin: 0 auto 1.5em;
-	}
-`;
-
-const SubBannerAuthorInfo = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	padding: 0 2.5em;
-`;
-
-const BlogContent = styled.div`
-	span {
-		line-height: 1.2em;
-		display: inline-block;
-		margin-bottom: 0.3em;
-		@media (max-width: 767px) {
-			font-size: 1.3em !important;
-			text-align: justify;
-		}
-	}
-
-	img {
-		width: 100%;
-		height: 100%;
-		object-fit: fill;
-		margin-top: 3em;
-	}
-
-	b {
-		display: block;
-		font-size: 3em !important;
-		margin-bottom: 0.5em !important;
-		@media (max-width: 767px) {
-			font-size: 2em !important;
-		}
-	}
-
-	i {
-		display: block;
-		margin-top: 0.5em;
-		font-size: 1.4em !important;
-		@media (max-width: 767px) {
-			font-size: 12px !important;
-		}
-	}
-`;
-
-const Social = styled.section`
-	padding: 3em 0;
-	width: 30em;
-	max-width: 30em;
-`;
-
-const SocialWrap = styled.ul`
-	display: flex;
-	flex-flow: row wrap;
-`;
-
-const SocialIcon = styled.li`
-	display: inline-block;
-	padding-right: 0.5em;
-	a {
-		width: 3em;
-		height: 3em;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		border: 0.01em solid #ededed;
-		&:hover {
-			color: ${({ theme }) => theme.primary};
-			border: 0.01em solid ${({ theme }) => theme.primary};
-		}
-	}
-`;
-
-const TravelDiariesSection = styled.section`
-	padding: 3em 0;
-	text-align: center;
-	img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	@media (max-width: 767px) {
-		padding: 0;
-		img {
-			height: 25em;
-		}
-	}
-`;
-
-const TravelDiariesHeading = styled.h2`
-	font-size: 2.5em;
-	font-weight: 400;
-	text-transform: uppercase;
-	color: ${({ theme }) => theme.primary};
-	width: 100%;
-	border-bottom: 0.01em solid #565656;
-	margin-bottom: 2em;
-	span {
-		background: #fff;
-		position: relative;
-		top: 0.6em;
-		padding: 0 2em;
-		@media (max-width: 767px) {
-			padding: 0 0.7em;
-		}
-	}
-`;
-
-const CategoryTagsWrap = styled.div`
-	display: flex;
-	justify-content: space-between;
-	padding: 3em 0;
-	h3 {
-		color: ${({ theme }) => theme.primary};
-		text-transform: uppercase;
-		font-size: 2em;
-		margin-bottom: 1.2em;
-	}
-
-	@media (max-width: 600px) {
-		flex-flow: column wrap;
-		justify-content: center;
-	}
-`;
-
-const Category = styled.div`
-	padding: 3em;
-	ul {
-		width: 25em;
-		max-width: 25em;
-		li {
-			padding: 0.7em 0;
-			border-top: 0.01em solid #565656;
-			a {
-				&:hover {
-					color: ${({ theme }) => theme.primary};
-				}
-			}
-
-			@media (max-width: 600px) {
-				border: none;
-			}
-		}
-
-		@media (max-width: 991px) {
-			width: 15em;
-			max-width: 15em;
-		}
-
-		@media (max-width: 600px) {
-			width: 100%;
-			max-width: 100%;
-		}
-	}
-`;
-
-const Tags = styled.div`
-	padding: 3em;
-	width: 50em;
-	max-width: 50em;
-	ul {
-		li {
-			display: inline-block;
-			border: 0.01em solid #565656;
-			padding: 0.3em;
-			margin-right: 0.5em;
-			margin-bottom: 0.5em;
-			a {
-				display: block;
-				margin-bottom: 0;
-				&:hover {
-					color: ${({ theme }) => theme.primary};
-				}
-			}
-		}
-	}
-	@media (max-width: 600px) {
-		width: 100%;
-		max-width: 100%;
-	}
-`;
-
-const SocialFollow = styled.div`
-	padding: 3em;
-	h3 {
-		color: ${({ theme }) => theme.primary};
-		text-transform: uppercase;
-		font-size: 2em;
-		margin-bottom: 1.2em;
-	}
-
-	@media (max-width: 991px) {
-		padding: 0em 3em 3em;
-	}
-`;
-
-const Index = ({ data, links, categoryItems, tags }) => {
-	return (
-		<>
-			<Head>
-				<meta name="description" content={data.metaDescription} />
-				<meta name="keywords" content={data.metaKeyword} />
-				<link
-					href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"
-					rel="stylesheet"
-				></link>
-				<title>{data.metaTitle}</title>
-			</Head>
-			<Layout>
-				<Banner img={links.bannerBackground}>
-					<BannerElement>
-						<BannerTitle>{data.title}</BannerTitle>
-						<BannerDate>{moment(data.date).format("MMMM DD, YYYY")}</BannerDate>
-					</BannerElement>
-				</Banner>
-				<Container>
-					<SubBanner>
-						<SubBannerTitle>
-							Cylcing along colourful canal houses, exploring remarkable parks
-							and endless shopping: we take you to stylish Copenhagen.
-						</SubBannerTitle>
-						<SubBannerAuthor>
-							<SubBannerAuthorAvatar src={links.authorAvatar} loading="lazy" />
-							<SubBannerAuthorInfo>
-								<Paragraph>Author: Paula van de Kamp</Paragraph>
-							</SubBannerAuthorInfo>
-							<SubBannerAuthorInfo>
-								<Paragraph>Photographer: Paula van de Kemp</Paragraph>
-							</SubBannerAuthorInfo>
-						</SubBannerAuthor>
-					</SubBanner>
-					<BlogContent
-						dangerouslySetInnerHTML={{ __html: data.text }}
-					></BlogContent>
-					<Social>
-						<SocialWrap>
-							{_.map(socialLinks, (link) => (
-								<SocialIcon key={link}>
-									<AnchorLink href="/">
-										<Icon className={link}></Icon>
-									</AnchorLink>
-								</SocialIcon>
-							))}
-						</SocialWrap>
-					</Social>
-				</Container>
-				<TravelDiariesSection>
-					<Container>
-						<TravelDiariesHeading>
-							<span>About Travel Diaries</span>
-						</TravelDiariesHeading>
-					</Container>
-					<Image src={links.diariesBackground} />
-				</TravelDiariesSection>
-				<Container>
-					<CategoryTagsWrap>
-						<Category>
-							<h3>Category</h3>
-							<UnorderedList>
-								{_.map(categoryItems, (item) => (
-									<ListItem key={item} displayBlock>
-										<AnchorLink href="/">{item}</AnchorLink>
-									</ListItem>
-								))}
-							</UnorderedList>
-						</Category>
-						<Tags>
-							<h3>Tags</h3>
-							<UnorderedList>
-								{_.map(tags, (item) => (
-									<ListItem key={item}>
-										<AnchorLink href="/">{item}</AnchorLink>
-									</ListItem>
-								))}
-							</UnorderedList>
-						</Tags>
-					</CategoryTagsWrap>
-					<SocialFollow>
-						<h3>Follow Us</h3>
-						<SocialWrap>
-							{_.map(socialLinks, (link) => (
-								<SocialIcon key={link}>
-									<AnchorLink href="/">
-										<Icon className={link}></Icon>
-									</AnchorLink>
-								</SocialIcon>
-							))}
-						</SocialWrap>
-					</SocialFollow>
-				</Container>
-			</Layout>
-		</>
-	);
-};
-
-export async function getStaticProps() {
-	return {
-		props: {
-			data,
-			links,
-			categoryItems,
-			socialLinks,
-			tags,
-		},
-	};
+export default {
+    dateFormatter: (date) =>
+        date
+            ? `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1)
+                  .toString()
+                  .padStart(2, '0')}.${date.getFullYear()}`
+            : ' - ',
+    'dateFormatter.shortDate': (date) =>
+        date
+            ? `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1)
+                  .toString()
+                  .padStart(2, '0')}.${date.getFullYear()}`
+            : ' - ',
+    monthFormatter: (date) =>
+        date ? date.toLocaleString('de-CH', { year: 'numeric', month: 'long' }) : ' - ', // November 2021
+    weekFormatter: (date) => (date ? `W${getWeek(date)} ${date.getFullYear()}` : ' - '), // W28 2021
+    priceFormatter: (price, currency) =>
+        currency && price
+            ? price.toLocaleString('de-CH', { style: 'currency', currency })
+            : price
+            ? price.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : 0,
+    numberFormatter: (number) =>
+        number
+            ? number.toLocaleString('de-CH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+            : 0,
+    twoDigitFormatter: (number) =>
+        number
+            ? number.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : 0,
+    loadingDictionaries: 'Metadaten werden geladen.',
+    loadingDictionariesFailed: 'Laden der Metadaten ist fehlgeschlagen.',
+    loadingPermissions: 'Berechtigungen werden geladen.',
+    loadingPermissionsFailed: 'Laden der Berechtigungen ist fehlgeschlagen.',
+    login: 'Anmelden',
+    loginFailed: 'Einloggen ist fehlgeschlagen.',
+    logout: 'Abmelden',
+    email: 'E-Mail',
+    username: 'Benutzername',
+    name: 'Name',
+    password: 'Passwort',
+    currentPassword: 'Aktuelles Passwort',
+    newPassword: 'Neues Passwort',
+    repeatNewPassword: 'Neues Passwort wiederholen',
+    forgotPassword: 'Passwort vergessen?',
+    changePassword: 'Passwort ändern',
+    resetPassword: 'Passwort zurücksetzen',
+    incorrectPassword: 'Passwort ist nicht korrekt.',
+    passwordValidationRules: (minLength) =>
+        `Passwort muss mindestens ${minLength} Zeichen lang sein und aus Gross-, Kleinbuchstaben, Zahlen und einem Sonderzeichen bestehen.`,
+    passwordLengthError: (minLength, maxLength) =>
+        `Passwort muss mindestens ${minLength} Zeichen lang sein.`,
+    repeatedPasswordMismatchError: 'Neues Passwort stimmt nicht überein.',
+    passwordSpecialCharacterError: 'Passwort muss mindestens ein Sonderzeichen enthalten.',
+    passwordUpperCaseLetterError: 'Passwort muss mindestens einen Grossbuchstaben enthalten',
+    passwordLowerCaseLetterError: 'Passwort muss mindestens einen Kleinbuchstaben enthalten.',
+    passwordDigitError: 'Passwort muss mindestens eine Zahl enthalten.',
+    currentPasswordIsRequiredError:
+        'Um ein neues Passwort zu setzen, geben Sie bitte das Aktuelle auch ein.',
+    newPasswordIsRequiredError: 'Neues Password ist ein Pflichtfeld.',
+    passwordConfirmationIsRequiredError: 'Bitte geben Sie das neue Passwort nochmal ein.',
+    applyNewPassword: 'Neues Password übernehmen',
+    passwordChangeFailed: (logNumber) =>
+        `Password konnte nicht aktualisiert werden. Technische Details finden Sie im Log #${logNumber}.`,
+    passwordChangeRequestFailed: `Beim Speichern des neuen Passworts auf dem Server ist ein Fehler aufgetreten.`,
+    passwordChangeSuccess: `Password wurde aktualisiert.`,
+    register: 'Registrieren',
+    'authentication.description':
+        'Haben Sie bereits ein Login? Dann geben Sie Ihre Anmeldedaten ein oder registrieren Sie sich.',
+    'authentication.initializationError':
+        'Bei der Initialisierung des Authentifizierungsprozesses ist ein Fehler aufgetreten.',
+    insufficientPermissions: 'Unzureichende Berechtigungen',
+    home: 'Home',
+    dateRange: 'Laufzeit',
+    organizationStructure: 'Organisationsstruktur',
+    'cockpit.myJobs': 'Meine Stellen',
+    proAnalytics: 'ProAnalytics',
+    'proAnalytics.title': 'ProAnalytics',
+    'proAnalytics.dashboard': 'ProAnalytics Dashboard',
+    'proAnalytics.selectOrganisationNodeRequest':
+        'Bitte setzen Sie zuerst den Filter Organisationsstruktur ein.',
+    'proAnalytics.jobCountStatistics': 'Anzahl Stellen',
+    'proAnalytics.jobCountStatistics.average': (value) =>
+        `${Number(value).toLocaleString('de-CH', {
+            maximumFractionDigits: 2,
+        })} Offene Stellen im Durchschnitt/Tag`,
+    'proAnalytics.performanceStatistics': 'Performance',
+    'proAnalytics.performanceStatisticsActionType': 'AktionsTyp',
+    'proAnalytics.viewBy.fieldOfActivity': 'Berufsgruppe',
+    'proAnalytics.careerCenterStatisticsActionType': 'AktionsTyp',
+    'proAnalytics.careerCenterStatistics': 'Ihr Stellenmarkt',
+    'proAnalytics.careerCenterStatisticsUtm': 'Stellenaufrufe nach UTM',
+    'proAnalytics.careerCenterStatisticsSearch': 'Suchbegriffe',
+    'proAnalytics.careerCenterStatisticsSelection': 'Filter',
+    'proAnalytics.careerCenterStatisticsJobabos': 'Jobabos',
+    'proAnalytics.careerCenterStatisticsPrevPeriod': '% Vorperiode',
+    'proAnalytics.careerCenterStatisticsSearchWeb': 'Suchanfragen Internet',
+    'proAnalytics.careerCenterStatisticsSearchIntranet': 'Suchanfragen Intranet',
+    'proAnalytics.careerCenterStatisticsRank': 'Rang',
+    'proAnalytics.careerCenterStatisticsFilter': 'Filter',
+    'proAnalytics.careerCenterStatisticsElement': 'Element',
+    'proAnalytics.careerCenterStatisticsViews': 'Anfragen',
+    'proAnalytics.careerCenterStatisticsIntranet': 'Intranet',
+    'proAnalytics.careerCenterStatisticsInternet': 'Internet',
+    'proAnalytics.careerCenterStatisticsStelle': 'Stelle',
+    'proAnalytics.careerCenterStatisticsTotal': 'Total',
+    'proAnalytics.careerCenterStatisticsFacebook': 'Facebook',
+    'proAnalytics.careerCenterStatisticsGoogle': 'Google',
+    'proAnalytics.careerCenterStatisticsLinkedIn': 'LinkedIn',
+    'proAnalytics.careerCenterStatisticsDirectLink': 'Direktlink',
+    'proAnalytics.careerCenterStatisticsNoUTM': 'kein UTM',
+    'proAnalytics.careerCenterStatisticsOther': 'weitere',
+    'proAnalytics.performanceStatisticsActionType.clicks': 'Klicks',
+    'proAnalytics.performanceStatisticsActionType.views': 'Views',
+    'proAnalytics.performanceStatisticsActionType.applications': 'Bewerbungen',
+    'proAnalytics.careerCenterStatisticsActionType.utm': 'UTM',
+    'proAnalytics.careerCenterStatisticsActionType.search': 'SUCHE',
+    'proAnalytics.careerCenterStatisticsActionType.selection': 'AUSWAHL',
+    'proAnalytics.viewBy.jobs': 'Stellen',
+    'proAnalytics.candidateJourneyStatistics': 'Candidate Journey',
+    'proAnalytics.costsStatistics': 'Kosten',
+    'proAnalytics.costsProApplication': 'Kosten pro Bewerbung',
+    'proAnalytics.costsProMedium': 'Kosten pro Medium',
+    'proAnalytics.costsPerMediumStatistics': 'Kosten pro Medium Statistik',
+    'proAnalytics.costsProView': 'Kosten pro View',
+    'proAnalytics.costsProClick': 'Kosten pro Klick',
+    'proAnalytics.publicationsPerMedium': 'Publikationen pro Medium',
+    'proAnalytics.viewsPerOnlineDay': 'Views/OT',
+    'proAnalytics.clicksPerOnlineDay': 'Bewerberklicks/OT',
+    'proAnalytics.applicationsPerOnlineDay': 'Bewerbungen/OT',
+    'proAnalytics.applications': 'Bewerbungen',
+    'proAnalytics.clicks': 'Bewerberklicks',
+    'proAnalytics.deviceRatio': '% web|mob',
+    'proAnalytics.activeJobAds': 'Aktive Stellen',
+    'proAnalytics.pits': 'Pits',
+    'proAnalytics.web': 'Web',
+    'proAnalytics.mobile': 'Mobile',
+    'proAnalytics.search': 'Suche',
+    'proAnalytics.search.placeholder':
+        'Stellentitel, Recruiter, Auftrags-, Publikations- oder Stellennummer',
+    'proAnalytics.search.recruiterKeyword': 'Recruiter',
+    'proAnalytics.search.termEverywhere': ({ searchTerm, hitCount }) =>
+        `Ergebnisse für '${searchTerm}' ${hitCount === undefined ? '' : `(${hitCount})`}`,
+    'proAnalytics.search.termInColumn': ({ searchTerm, fieldName, hitCount }) =>
+        `Ergebnisse für '${searchTerm}' in ${fieldName} (${hitCount})`,
+    'proAnalytics.search.resultInfo': ({ searchTerm, fieldName, hitCount }) =>
+        `${hitCount} ${
+            hitCount === 1 ? 'Ergebnis' : 'Ergebnisse'
+        } für ${searchTerm} in ${fieldName}`,
+    'proAnalytics.search.jobTitle': (jobTitle) => `Job-Titel: '${jobTitle}'`,
+    'proAnalytics.search.externalJobTitle': (jobTitle) => `Externer Job-Titel: '${jobTitle}'`,
+    'proAnalytics.search.postingId': (id) => `Stellennummer: '${id}'`,
+    'proAnalytics.search.publicationId': (id) => `Publikationsnummer: '${id}'`,
+    'proAnalytics.search.orderId': (id) => `Auftragsnummer: '${id}'`,
+    'proAnalytics.dateRange.autoCorrectionWarning': ({ start, end }) =>
+        `Es stehen Daten der letzten zwei Jahre zur Verfügung. Ihr Filter wurde dementsprechend angepasst.`,
+    'proAnalytics.dictionaries.error': ({ logNumber }) =>
+        'Filter Dictionaries konnte nicht aktualisiert werden. Technische Details finden Sie im Log #${logNumber}.',
+    'proAnalytics.search.error': ({ logNumber }) =>
+        `Die Suche ist fehlgeschlagen. Technische Details finden Sie im Log #${logNumber}.`,
+    'proAnalytics.jobCount.error': ({ logNumber }) =>
+        `Anzahl Stellen konnte nicht geladen werden. Technische Details finden Sie im Log #${logNumber}.`,
+    'proAnalytics.performance.error': ({ logNumber }) =>
+        `Daten von Performance konnten nicht geladen werden. Technische Details finden Sie im Log #${logNumber}.`,
+    'proAnalytics.candidateJourney.error': ({ logNumber }) =>
+        `Daten von Candidate Journey konnten nicht geladen werden. Technische Details finden Sie im Log #${logNumber}.`,
+    'proAnalytics.costs.error': ({ logNumber }) =>
+        `Kostendaten konnten nicht geladen werden. Technische Details finden Sie im Log #${logNumber}.`,
+    'proAnalytics.kpi.error': ({ logNumber }) =>
+        `KPI-Daten konnten nicht geladen werden. Technische Details finden Sie im Log #${logNumber}.`,
+    'proAnalytics.careerCenter.error': ({ logNumber }) =>
+        `Stellenmarktstatistiken konnten nicht geladen werden. Technische Details finden Sie im Log #${logNumber}.`,
+    'proAnalytics.moreFilters': 'Mehr Filter',
+    'proAnalytics.lessFilters': 'Weniger Filter',
+    'proAnalytics.resetFilters': 'Alle zurücksetzen',
+    'proAnalytics.maxDatasetsNumberInfo': (maxDatasetsNumber) =>
+        `Sie können maximal ${maxDatasetsNumber} Datasets anzeigen.`,
+    'proAnalytics.view.byJobAd': 'nach Stelle',
+    'proAnalytics.view.byMedium': 'nach Medium',
+    'proAnalytics.view.byFieldOfActivity': 'nach Berufsgruppe',
+    'proAnalytics.candidateJourney.trackingViewsWarning':
+        'Für manche Medien können keine Aufrufe gemessen werden.',
+    'proAnalytics.candidateJourney.trackingClicksWarning':
+        'Für manche Medien können keine Klicks gemessen werden.',
+    'proAnalytics.candidateJourney.trackingApplicationsWarning':
+        'Für manche Medien können keine Bewerbungen gemessen werden.',
+    'proAnalytics.candidateJourney.trackingViewsInfo':
+        'Die ausgewiesene Statistik weist die korrekten Zahlen auf.',
+    'proAnalytics.candidateJourney.trackingClicksInfo':
+        'Die ausgewiesene Statistik weist die korrekten Zahlen auf.',
+    'proAnalytics.candidateJourney.trackingApplicationsInfo':
+        'Die ausgewiesene Statistik weist die korrekten Zahlen auf.',
+    'proAnalytics.mediaTrackingInfo': 'Medium-Tracking-Infos',
+    'proAnalytics.loadingDictionaries': 'Dictionaries werden geladen',
+    'proAnalytics.loadingCustomerConfig': 'Kundenkonfiguration wird geladen.',
+    'proAnalytics.insufficientPermissions':
+        'Sie haben keine Berechtigungen um auf das ProAnalytics Modul zuzugreifen.',
+    'proAnalytics.reports.insufficientPermissions':
+        'Sie haben keine Berechtigungen um auf das Reports Modul zuzugreifen.',
+    'proAnalytics.rangePickerFormat': 'DD.MM.YYYY',
+    'posting.create': 'Neues Inserat erstellen',
+    'settings.displayOnProfile': 'Anzeige in meinem Profil',
+    'settings.mediaLists': 'Medienlisten',
+    'settings.preferences': 'Einstellungen',
+    order: 'Auftrag',
+    orderId: 'Auftrags-ID',
+    posting: 'Inserat',
+    postingId: 'Inserats-ID',
+    publication: 'Publikation',
+    publications: 'Publikationen',
+    publicationId: 'Publikation ID',
+    cockpit: 'Cockpit',
+    jobs: 'Stellen',
+    company: 'Firma',
+    companyName: 'Firmenname',
+    country: 'Land',
+    'country.usa': 'USA',
+    'country.greatBritain': 'Grossbritannien',
+    'country.unitedKingdom': 'Grossbritannien',
+    'country.germany': 'Deutschland',
+    'country.austria': 'Österreich',
+    'country.france': 'Frankreich',
+    'country.italy': 'Italien',
+    'country.switzerland': 'Schweiz',
+    language: 'Sprache',
+    'language.english': 'Englisch',
+    'language.german': 'Deutsch',
+    'language.french': 'Französisch',
+    'language.italian': 'Italienisch',
+    'language.swissGerman': 'Schweizerdeutsch',
+    settings: 'Einstellungen',
+    'settings.manageMediaList': 'Medienliste verwalten',
+    'settings.yourAccessData': 'Ihre Zugangsdaten für den JobBooster',
+    'settings.password.title': 'Login & Passwort',
+    help: 'Hilfe',
+    cancel: 'Abbrechen',
+    timePeriod: 'Zeitraum',
+    dateFrom: 'Von',
+    dateTo: 'Bis',
+    yesterday: 'Gestern',
+    currentMonth: 'Laufender Monat',
+    lastMonth: 'Letzter Monat',
+    currentYear: 'Laufendes Jahr',
+    lastYear: 'Letztes Jahr',
+    recruiter: 'Recruiter',
+    recruiterId: 'Recruiter-ID',
+    recruiterName: 'Recruiter-Name',
+    recruiters: 'Recruiter',
+    allRecruiters: 'Alle Recruiter',
+    medium: 'Medium',
+    mediumId: 'Medium-ID',
+    media: 'Medien',
+    'media.online': 'Online',
+    'media.print': 'Print',
+    'media.ppp': 'PPP',
+    'media.ppd': 'PPD',
+    'media.private': 'Privat',
+    mediaType: 'Medientyp',
+    allMedia: 'Alle Medien',
+    fieldOfActivity: 'Berufsgruppe',
+    allFieldsOfActivity: 'Alle Berufsgruppen',
+    industry: 'Branche',
+    allIndustries: 'Alle Branchen',
+    atsId: 'Interne ID oder ATS-ID',
+    apply: 'Übernehmen',
+    'validator.username.required': 'Bitte geben Sie Ihren Benutzernamen an.',
+    'validator.password.required': 'Bitte geben Sie Ihr Passwort an.',
+    'validator.email.required': 'Bitte geben Sie die E-Mail-Adresse an.',
+    'validator.email.format': 'Eingegebene E-Mail-Adresse ist nicht korrekt.',
+    all: 'Alle',
+    total: 'Total',
+    cost: 'Kosten',
+    date: 'Datum',
+    other: (count) => (count !== undefined ? `Andere (${count})` : 'Andere'),
+    showMore: 'Mehr',
+    showLess: 'Weniger',
+    search: 'Suchen',
+    state: 'Zustand',
+    overview: 'Übersicht',
+    noData: 'Keine Daten',
+    applications: 'Bewerbungen',
+    clicks: 'Bewerberklicks',
+    views: 'Views',
+    jobAd: 'Stelle',
+    jobId: 'Stelle ID',
+    'jobAd.internalTitle': 'Titel (intern)',
+    'jobAd.externalTitle': 'Titel (extern)',
+    'jobAd.title': 'Titel',
+    'kpiStatistics.stellen': 'Stellen',
+    'kpiStatistics.publications': 'Publikationen',
+    'kpiStatistics.costs': 'Kosten',
+    checkLog: (logNumber) => `Technische Details finden Sie im Log #${logNumber}.`,
+    error: 'Fehler',
+    unexpectedError: ({ logNumber }) =>
+        `Etwas ist schiefgelaufen. Technische Details finden Sie im Log #${logNumber}.`,
+    refreshRequest: 'Bitte laden Sie die Applikation neu oder versuchen Sie es später nochmals.',
+    recentlyUsed: 'Zuletzt benutzt',
+    information: 'Information',
+    webMobile: 'Verteilung Web-Mobile',
+    back: 'Zurück',
 }
-
-export default Index;
